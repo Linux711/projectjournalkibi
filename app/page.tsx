@@ -132,21 +132,17 @@ export default function Home() {
   return (
     <main className="py-10 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-lg font-bold mb-4">Project Journal</h1>
+        <h1 className="text-lg font-semibold tracking-tight mb-4">Project Journal</h1>
         {/* Export/Import Buttons */}
         <div className="flex gap-2 mb-4">
           <button
-            style={{ backgroundColor: "#8783d1ff" }}
-            className="text-white px-4 py-2 rounded hover:opacity-90"
+            className="border border-line bg-white text-gray-600 px-3 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition"
             onClick={handleExport}
             type="button"
           >
             Export
           </button>
-          <label
-            style={{ backgroundColor: "#44677eff" }}
-            className="text-white px-4 py-2 rounded hover:opacity-90 cursor-pointer"
-          >
+          <label className="border border-line bg-white text-gray-600 px-3 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition cursor-pointer">
             Import
             <input
               type="file"
@@ -157,8 +153,7 @@ export default function Home() {
             />
           </label>
           <button
-            style={{ backgroundColor: expandByDefault ? "#38A3A5" : "#b0b0b0" }}
-            className="text-white px-4 py-2 rounded hover:opacity-90 ml-auto"
+            className={`px-3 py-1.5 rounded-lg text-sm transition ml-auto ${expandByDefault ? "bg-accent text-white hover:opacity-90" : "border border-line bg-white text-gray-600 hover:bg-gray-50"}`}
             onClick={() => setExpandByDefault(!expandByDefault)}
             type="button"
           >
@@ -168,15 +163,14 @@ export default function Home() {
         {/* Add Category Form */}
         <form onSubmit={addCategory} className="flex gap-2 mb-6">
           <input
-            className="border rounded px-3 py-2 flex-1 bg-white"
+            className="border border-line rounded-lg px-3 py-2 flex-1 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
             placeholder="New category name"
             value={newCategoryName}
             onChange={e => setNewCategoryName(e.target.value)}
             required
           />
           <button
-            style={{ backgroundColor: "#38A3A5" }}
-            className="text-white px-4 py-2 rounded hover:opacity-90"
+            className="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
             type="submit"
           >
             Add Category
@@ -185,13 +179,13 @@ export default function Home() {
 
         <div className="space-y-6">
           {hiddenCategories.size > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-              <div className="text-sm font-medium mb-2">Hidden Categories ({hiddenCategories.size}):</div>
+            <div className="bg-accent-soft border border-line rounded-xl p-3 mb-4">
+              <div className="text-sm font-medium mb-2 text-ink">Hidden Categories ({hiddenCategories.size}):</div>
               <div className="flex flex-wrap gap-2">
                 {categories.filter(cat => hiddenCategories.has(cat.id)).map(cat => (
                   <button
                     key={cat.id}
-                    className="bg-blue-200 hover:bg-blue-300 text-blue-900 px-3 py-1 rounded text-sm"
+                    className="bg-white border border-line hover:bg-gray-50 text-gray-700 px-3 py-1 rounded-lg text-sm transition"
                     onClick={() => setHiddenCategories(prev => {
                       const newSet = new Set(prev);
                       newSet.delete(cat.id);
@@ -205,13 +199,13 @@ export default function Home() {
             </div>
           )}
           {hiddenProjects.size > 0 && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-              <div className="text-sm font-medium mb-2">Hidden Projects ({hiddenProjects.size}):</div>
+            <div className="bg-accent-soft border border-line rounded-xl p-3 mb-4">
+              <div className="text-sm font-medium mb-2 text-ink">Hidden Projects ({hiddenProjects.size}):</div>
               <div className="flex flex-wrap gap-2">
                 {categories.flatMap(cat => cat.projects.filter(p => hiddenProjects.has(p.id))).map(p => (
                   <button
                     key={p.id}
-                    className="bg-green-200 hover:bg-green-300 text-green-900 px-3 py-1 rounded text-sm"
+                    className="bg-white border border-line hover:bg-gray-50 text-gray-700 px-3 py-1 rounded-lg text-sm transition"
                     onClick={() => setHiddenProjects(prev => {
                       const newSet = new Set(prev);
                       newSet.delete(p.id);
@@ -225,16 +219,16 @@ export default function Home() {
             </div>
           )}
           {categories.length === 0 ? (
-            <div className="text-gray-500">No categories yet.</div>
+            <div className="text-gray-400 text-sm text-center py-10">No categories yet. Add one above to get started.</div>
           ) : (
             categories.map(cat => (
               cat.id === activeCategory?.id && (
-              <div key={cat.id} className="border rounded-lg p-4 bg-gray-50">
+              <div key={cat.id} className="border border-line rounded-2xl p-5 bg-white shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="relative">
                     <button
                       type="button"
-                      className="flex items-center gap-1 text-base font-semibold text-[#44677eff]"
+                      className="flex items-center gap-1 text-base font-semibold tracking-tight text-ink"
                       onClick={() => setCategoryMenuOpen(open => !open)}
                       title="Choose category"
                     >
@@ -244,12 +238,12 @@ export default function Home() {
                       </svg>
                     </button>
                     {categoryMenuOpen && (
-                      <div className="absolute left-0 mt-1 min-w-40 bg-white border rounded shadow-lg z-20">
+                      <div className="absolute left-0 mt-1 min-w-40 bg-white border border-line rounded-lg shadow-lg z-20 overflow-hidden">
                         {visibleCategories.map(c => (
                           <button
                             key={c.id}
                             type="button"
-                            className={`block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 ${c.id === cat.id ? 'font-semibold text-[#44677eff]' : 'text-gray-700'}`}
+                            className={`block w-full text-left px-3 py-1.5 text-sm hover:bg-accent-soft transition ${c.id === cat.id ? 'font-semibold text-ink' : 'text-gray-700'}`}
                             onClick={() => {
                               setActiveCategoryId(c.id);
                               setCategoryMenuOpen(false);
@@ -261,9 +255,9 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
-                      className="text-gray-600 hover:text-gray-800 p-1"
+                      className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-1.5 rounded-full transition"
                       onClick={() => setHiddenCategories(prev => new Set([...prev, cat.id]))}
                       title="Hide Category"
                     >
@@ -272,7 +266,7 @@ export default function Home() {
                       </svg>
                     </button>
                     <button
-                      className="text-red-600 hover:text-red-800 p-1"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-full transition"
                       onClick={() => {
                         if (window.confirm(`Are you sure you want to delete "${cat.name}" and all its projects?`)) {
                           deleteCategory(cat.id);
@@ -290,15 +284,14 @@ export default function Home() {
                   <>
                     <form onSubmit={(e) => { e.preventDefault(); addProjectToCategory(cat.id, projectInputs[cat.id] || ''); setProjectInputs(prev => ({...prev, [cat.id]: ''})); }} className="flex gap-2 mb-4 ml-4">
                       <input
-                        className="border rounded px-3 py-2 flex-1 bg-white"
+                        className="border border-line rounded-lg px-3 py-2 flex-1 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
                         placeholder="New project name"
                         value={projectInputs[cat.id] || ''}
                         onChange={e => setProjectInputs(prev => ({...prev, [cat.id]: e.target.value}))}
                         required
                       />
                       <button
-                        style={{ backgroundColor: "#8783d1ff" }}
-                        className="text-white px-4 py-2 rounded hover:opacity-90"
+                        className="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
                         type="submit"
                       >
                         Add Project
@@ -306,12 +299,12 @@ export default function Home() {
                     </form>
                 <div className="space-y-4">
                       {cat.projects.length === 0 ? (
-                        <div className="text-gray-500 ml-4">No projects in this category.</div>
+                        <div className="text-gray-400 text-sm ml-4">No projects in this category.</div>
                       ) : (
                         cat.projects.filter(p => !hiddenProjects.has(p.id)).map(p => (
                           <div key={p.id} className="relative">
                             <button
-                              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10 p-1"
+                              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full z-10 p-1.5 transition"
                               onClick={() => setHiddenProjects(prev => new Set([...prev, p.id]))}
                               title="Hide Project"
                             >

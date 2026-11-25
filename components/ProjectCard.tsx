@@ -111,12 +111,12 @@ export default function ProjectCard({
 
   function renderEntry(entry: { date: string; hoursSpent: string; notes: string }) {
     return (
-      <li key={entry.date} className="border rounded px-3 py-2 bg-gray-50">
-        <div className="text-xs text-gray-500 mb-1">{entry.date}</div>
+      <li key={entry.date} className="border border-line rounded-xl px-3 py-2 bg-background/60">
+        <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">{entry.date}</div>
         <div className="flex gap-2">
           <input
             type="text"
-            className="border rounded px-2 py-1 w-20 text-sm"
+            className="border border-line rounded-lg px-2 py-1 w-20 text-sm text-center font-mono bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
             value={entry.hoursSpent}
             placeholder="e.g. 2:30"
             maxLength={4}
@@ -130,7 +130,7 @@ export default function ProjectCard({
             onClick={e => e.stopPropagation()}
           />
           <textarea
-            className="border rounded px-2 py-1 flex-1 text-sm resize-none"
+            className="border border-line rounded-lg px-2 py-1 flex-1 text-sm leading-relaxed resize-none bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
             style={{ height: 'auto', overflow: 'hidden' }}
             rows={1}
             value={entry.notes}
@@ -150,7 +150,7 @@ export default function ProjectCard({
             onClick={e => e.stopPropagation()}
           />
           <button
-            className="text-red-600 hover:text-red-800 p-1"
+            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-full transition self-start"
             onClick={e => {
               e.stopPropagation();
               if (window.confirm('Are you sure you want to delete this entry?')) {
@@ -189,16 +189,16 @@ export default function ProjectCard({
   }, [monthKeys.length]);
 
   return editingJson ? (
-    <div className="p-4 border rounded-lg shadow bg-white">
-      <h3 className="font-semibold mb-2">Edit Project JSON</h3>
+    <div className="p-5 border border-line rounded-2xl shadow-sm bg-white">
+      <h3 className="font-semibold tracking-tight mb-2">Edit Project JSON</h3>
       <textarea
-        className="w-full h-96 border rounded p-2 font-mono text-sm"
+        className="w-full h-96 border border-line rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
         value={jsonText}
         onChange={e => setJsonText(e.target.value)}
       />
       <div className="flex gap-2 mt-2">
         <button
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
           onClick={() => {
             try {
               const parsed = JSON.parse(jsonText);
@@ -216,7 +216,7 @@ export default function ProjectCard({
           Save
         </button>
         <button
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          className="border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm hover:bg-red-50 transition"
           onClick={() => {
             if (window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
               onDelete(project.id);
@@ -227,7 +227,7 @@ export default function ProjectCard({
           Delete Project
         </button>
         <button
-          className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+          className="border border-line bg-white text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
           onClick={() => setEditingJson(false)}
         >
           Cancel
@@ -236,7 +236,7 @@ export default function ProjectCard({
     </div>
   ) : (
     <div
-      className={`p-4 border rounded-lg shadow bg-white hover:bg-gray-50 transition ${selected ? "ring-2 ring-blue-400" : ""}`}
+      className={`p-5 border rounded-2xl bg-white shadow-sm hover:shadow transition ${selected ? "border-line border-l-4 border-l-accent" : "border-line"}`}
       onClick={handleCardClick}
       tabIndex={0}
       style={{ cursor: "pointer" }}
@@ -244,7 +244,7 @@ export default function ProjectCard({
   <div className="flex items-center justify-between mb-2">
   {editing ? (
           <input
-            className="flex-1 border rounded px-2 py-1 mr-2 bg-white"
+            className="flex-1 border border-line rounded-lg px-2 py-1 mr-2 bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
             value={editName}
             onChange={e => setEditName(e.target.value)}
             onKeyDown={e => {
@@ -254,7 +254,7 @@ export default function ProjectCard({
             autoFocus
           />
         ) : (
-              <span className="flex-1 font-semibold text-lg text-[#44677eff]">
+              <span className="flex-1 font-semibold tracking-tight text-lg text-ink">
                 {project.name}
               </span>
         )}
@@ -262,7 +262,7 @@ export default function ProjectCard({
           {editing ? (
             <>
               <button
-                className="text-green-600 hover:text-green-800 p-1"
+                className="text-green-600 hover:text-green-700 hover:bg-green-50 p-1.5 rounded-full transition"
                 onClick={handleSave}
                 title="Save"
               >
@@ -271,7 +271,7 @@ export default function ProjectCard({
                 </svg>
               </button>
               <button
-                className="text-gray-600 hover:text-gray-800 p-1"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-1.5 rounded-full transition"
                 onClick={handleCancel}
                 title="Cancel"
               >
@@ -283,7 +283,7 @@ export default function ProjectCard({
           ) : (
             <>
               <button
-                className="text-blue-600 hover:text-blue-800 p-1"
+                className="text-gray-500 hover:text-ink hover:bg-gray-100 p-1.5 rounded-full transition"
                 onClick={() => setEditing(true)}
                 title="Edit"
               >
@@ -292,7 +292,7 @@ export default function ProjectCard({
                 </svg>
               </button>
               <button
-                className="text-purple-600 hover:text-purple-800 p-1"
+                className="text-gray-500 hover:text-ink hover:bg-gray-100 p-1.5 rounded-full transition"
                 onClick={() => {
                   setEditingJson(true);
                   setJsonText(JSON.stringify(project, null, 2));
@@ -307,16 +307,16 @@ export default function ProjectCard({
           )}
         </div>
       </div>
-      <div className="text-sm text-gray-500">Last updated: {getLastUpdated(project)}</div>
+      <div className="text-xs text-gray-400">Last updated: {getLastUpdated(project)}</div>
 
       {/* Today's entry input */}
       {selected && (
         <div className="mt-4">
-          <label className="block text-sm font-medium mb-1">Today's Entry</label>
+          <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">Today's Entry</label>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
-              className="border rounded px-2 py-1 w-20"
+              className="border border-line rounded-lg px-2 py-1 w-20 text-center font-mono bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
               value={todayEntry.hoursSpent}
               placeholder="e.g. 2:30"
               maxLength={4}
@@ -331,7 +331,7 @@ export default function ProjectCard({
             />
             <textarea
               ref={entryInputRef}
-              className="border rounded px-2 py-1 flex-1 resize-none"
+              className="border border-line rounded-lg px-2 py-1 flex-1 leading-relaxed resize-none bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
               style={{height: 'auto', overflow: 'hidden'}}
               rows={1}
               value={todayEntry.notes}
@@ -355,19 +355,19 @@ export default function ProjectCard({
 
       {/* Add New Entry Form */}
       {selected && (
-        <div className="mt-4">
-          <label className="block text-sm font-medium mb-1">Add New Entry</label>
+        <div className="mt-4 rounded-xl bg-accent-soft/60 p-3">
+          <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">Add New Entry</label>
           <div className="flex gap-2 mb-2">
             <input
               type="date"
-              className="border rounded px-2 py-1"
+              className="border border-line rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
               value={newEntryDate}
               onChange={e => setNewEntryDate(e.target.value)}
               onClick={e => e.stopPropagation()}
             />
             <input
               type="text"
-              className="border rounded px-2 py-1 w-20"
+              className="border border-line rounded-lg px-2 py-1 w-20 text-center font-mono bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
               value={newEntryHours}
               placeholder="0:00"
               maxLength={4}
@@ -376,7 +376,7 @@ export default function ProjectCard({
               onClick={e => e.stopPropagation()}
             />
             <textarea
-              className="border rounded px-2 py-1 flex-1 resize-none"
+              className="border border-line rounded-lg px-2 py-1 flex-1 leading-relaxed resize-none bg-white focus:outline-none focus:ring-2 focus:ring-accent/40"
               style={{height: 'auto', overflow: 'hidden'}}
               rows={1}
               value={newEntryNotes}
@@ -395,8 +395,7 @@ export default function ProjectCard({
               onClick={e => e.stopPropagation()}
             />
               <button
-                style={{ backgroundColor: "#38A3A5" }}
-                className="text-white px-4 py-2 rounded hover:opacity-90"
+                className="bg-accent text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition self-start"
                 type="button"
                 onClick={() => {
                   const formattedHours = formatHours(newEntryHours);
@@ -415,7 +414,7 @@ export default function ProjectCard({
       {/* Last 7 days: always visible and editable when the card is selected */}
       {selected && (
         <div className="mt-6">
-          <div className="font-semibold mb-2">Last 7 Days</div>
+          <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Last 7 Days</div>
           {recentEntries.length === 0 ? (
             <div className="text-gray-400 text-sm">No entries in the last 7 days.</div>
           ) : (
@@ -429,7 +428,7 @@ export default function ProjectCard({
       {/* Older entries (by month, paginated) on second click */}
       {selected && showDetails && (
         <div className="mt-6">
-          <div className="font-semibold mb-2">Older Entries</div>
+          <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Older Entries</div>
           {olderEntries.length === 0 ? (
             <div className="text-gray-400 text-sm">No older entries.</div>
           ) : (
@@ -438,7 +437,7 @@ export default function ProjectCard({
               {monthKeys.length > 1 && (
                 <div className="flex justify-between items-center mb-4">
                   <button
-                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                    className="px-3 py-1 text-sm border border-line bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition disabled:opacity-40"
                     onClick={e => {
                       e.stopPropagation();
                       setCurrentMonthIndex(Math.max(0, currentMonthIndex - 1));
@@ -447,7 +446,7 @@ export default function ProjectCard({
                   >
                     Prev
                   </button>
-                  <span className="font-medium">
+                  <span className="text-sm font-medium text-ink">
                     {currentMonthKey ? (() => {
                       const [year, month] = currentMonthKey.split('-');
                       const displayDate = new Date(parseInt(year), parseInt(month) - 1, 1);
@@ -455,7 +454,7 @@ export default function ProjectCard({
                     })() : ""}
                   </span>
                   <button
-                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                    className="px-3 py-1 text-sm border border-line bg-white text-gray-600 rounded-lg hover:bg-gray-50 transition disabled:opacity-40"
                     onClick={e => {
                       e.stopPropagation();
                       setCurrentMonthIndex(Math.min(monthKeys.length - 1, currentMonthIndex + 1));
