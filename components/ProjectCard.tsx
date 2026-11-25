@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Project } from '../types';
 import { getLastUpdated } from '../lib/utils';
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 
 function formatHours(value: string): string {
   const cleaned = value.replace(/[^0-9]/g, '');
@@ -104,14 +104,78 @@ export default function ProjectCard({
     .filter(e => e.date !== today)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  // Group entries by month
-  const groupedEntries = previousEntries.reduce((acc, entry) => {
+  // Entries from the last 7 days (excluding today), shown by default
+  const recentCutoff = format(subDays(new Date(), 7), "yyyy-MM-dd");
+  const recentEntries = previousEntries.filter(e => e.date >= recentCutoff);
+  const olderEntries = previousEntries.filter(e => e.date < recentCutoff);
+
+  function renderEntry(entry: { date: string; hoursSpent: string; notes: string }) {
+    return (
+      <li key={entry.date} className="border rounded px-3 py-2 bg-gray-50">
+        <div className="text-xs text-gray-500 mb-1">{entry.date}</div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            className="border rounded px-2 py-1 w-20 text-sm"
+            value={entry.hoursSpent}
+            placeholder="e.g. 2:30"
+            maxLength={4}
+            onChange={e => {
+              onEntryChange?.({ ...entry, hoursSpent: e.target.value });
+            }}
+            onBlur={e => {
+              const formatted = formatHours(e.target.value);
+              onEntryChange?.({ ...entry, hoursSpent: formatted });
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+          <textarea
+            className="border rounded px-2 py-1 flex-1 text-sm resize-none"
+            style={{ height: 'auto', overflow: 'hidden' }}
+            rows={1}
+            value={entry.notes}
+            placeholder="Notes"
+            ref={el => {
+              if (el) {
+                el.style.height = 'auto';
+                el.style.height = el.scrollHeight + 'px';
+              }
+            }}
+            onChange={e => {
+              const el = e.target;
+              el.style.height = 'auto';
+              el.style.height = el.scrollHeight + 'px';
+              onEntryChange?.({ ...entry, notes: e.target.value });
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            className="text-red-600 hover:text-red-800 p-1"
+            onClick={e => {
+              e.stopPropagation();
+              if (window.confirm('Are you sure you want to delete this entry?')) {
+                onEntryDelete?.(entry.date);
+              }
+            }}
+            title="Delete Entry"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </li>
+    );
+  }
+
+  // Group older entries by month
+  const groupedEntries = olderEntries.reduce((acc, entry) => {
     const [year, month] = entry.date.split('-').slice(0, 2);
     const monthKey = `${year}-${month}`;
     if (!acc[monthKey]) acc[monthKey] = [];
     acc[monthKey].push(entry);
     return acc;
-  }, {} as Record<string, typeof previousEntries>);
+  }, {} as Record<string, typeof olderEntries>);
 
   // Month keys sorted ascending (oldest first)
   const monthKeys = Object.keys(groupedEntries).sort();
@@ -348,12 +412,26 @@ export default function ProjectCard({
         </div>
       )}
 
-      {/* Show details (entries by month, paginated) on second click */}
+      {/* Last 7 days: always visible and editable when the card is selected */}
+      {selected && (
+        <div className="mt-6">
+          <div className="font-semibold mb-2">Last 7 Days</div>
+          {recentEntries.length === 0 ? (
+            <div className="text-gray-400 text-sm">No entries in the last 7 days.</div>
+          ) : (
+            <ul className="space-y-2">
+              {recentEntries.map(entry => renderEntry(entry))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* Older entries (by month, paginated) on second click */}
       {selected && showDetails && (
         <div className="mt-6">
-          <div className="font-semibold mb-2">Previous Entries</div>
-          {previousEntries.length === 0 ? (
-            <div className="text-gray-400 text-sm">No previous entries.</div>
+          <div className="font-semibold mb-2">Older Entries</div>
+          {olderEntries.length === 0 ? (
+            <div className="text-gray-400 text-sm">No older entries.</div>
           ) : (
             <>
               {/* Month navigation */}
@@ -393,67 +471,7 @@ export default function ProjectCard({
                 <div className="text-gray-400 text-sm">No entries for this month.</div>
               ) : (
                 <ul className="space-y-2">
-                  {currentMonthEntries.map(entry => (
-                    <li key={entry.date} className="border rounded px-3 py-2 bg-gray-50">
-                      <div className="text-xs text-gray-500 mb-1">{entry.date}</div>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          className="border rounded px-2 py-1 w-20 text-sm"
-                          value={entry.hoursSpent}
-                          placeholder="e.g. 2:30"
-                          maxLength={4}
-                          onChange={e => {
-                            onEntryChange?.({ ...entry, hoursSpent: e.target.value });
-                          }}
-                          onBlur={e => {
-                            const formatted = formatHours(e.target.value);
-                            onEntryChange?.({ ...entry, hoursSpent: formatted });
-                          }}
-                          onClick={e => e.stopPropagation()}
-                        />
-                        <textarea
-                          className="border rounded px-2 py-1 flex-1 text-sm resize-none"
-                          style={{height: 'auto', overflow: 'hidden'}}
-                          rows={1}
-                          value={entry.notes}
-                          placeholder="Notes"
-                          ref={el => {
-                            if (el) {
-                              el.style.height = 'auto';
-                              el.style.height = el.scrollHeight + 'px';
-                            }
-                          }}
-                          onChange={e => {
-                            const el = e.target;
-                            el.style.height = 'auto';
-                            el.style.height = el.scrollHeight + 'px';
-                            onEntryChange?.({ ...entry, notes: e.target.value });
-                          }}
-                          onInput={e => {
-                            const el = e.currentTarget;
-                            el.style.height = 'auto';
-                            el.style.height = el.scrollHeight + 'px';
-                          }}
-                          onClick={e => e.stopPropagation()}
-                        />
-                        <button
-                          className="text-red-600 hover:text-red-800 p-1"
-                          onClick={e => {
-                            e.stopPropagation();
-                            if (window.confirm('Are you sure you want to delete this entry?')) {
-                              onEntryDelete?.(entry.date);
-                            }
-                          }}
-                          title="Delete Entry"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </li>
-                  ))}
+                  {currentMonthEntries.map(entry => renderEntry(entry))}
                 </ul>
               )}
             </>

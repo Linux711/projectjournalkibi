@@ -16,6 +16,8 @@ export default function Home() {
   const [expandByDefault, setExpandByDefault] = useState(true);
   const [hiddenCategories, setHiddenCategories] = useState<Set<string>>(new Set());
   const [hiddenProjects, setHiddenProjects] = useState<Set<string>>(new Set());
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   function handleExport() {
     const data = exportCategories();
@@ -123,10 +125,14 @@ export default function Home() {
     setCategories(loadCategories());
   };
 
+  // Only one category is displayed at a time; falls back to the first visible one
+  const visibleCategories = categories.filter(c => !hiddenCategories.has(c.id));
+  const activeCategory = visibleCategories.find(c => c.id === activeCategoryId) ?? visibleCategories[0];
+
   return (
     <main className="py-10 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Project Journal</h1>
+        <h1 className="text-lg font-bold mb-4">Project Journal</h1>
         {/* Export/Import Buttons */}
         <div className="flex gap-2 mb-4">
           <button
@@ -222,15 +228,39 @@ export default function Home() {
             <div className="text-gray-500">No categories yet.</div>
           ) : (
             categories.map(cat => (
-              !hiddenCategories.has(cat.id) && (
+              cat.id === activeCategory?.id && (
               <div key={cat.id} className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex items-center justify-between mb-4">
-                  <h2
-                    className={`text-xl font-semibold cursor-pointer ${(expandByDefault || selectedCategoryId === cat.id) ? 'text-[#44677eff]' : 'text-gray-700'}`}
-                    onClick={() => setSelectedCategoryId(selectedCategoryId === cat.id ? null : cat.id)}
-                  >
-                    {cat.name}
-                  </h2>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 text-base font-semibold text-[#44677eff]"
+                      onClick={() => setCategoryMenuOpen(open => !open)}
+                      title="Choose category"
+                    >
+                      {cat.name}
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {categoryMenuOpen && (
+                      <div className="absolute left-0 mt-1 min-w-40 bg-white border rounded shadow-lg z-20">
+                        {visibleCategories.map(c => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            className={`block w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 ${c.id === cat.id ? 'font-semibold text-[#44677eff]' : 'text-gray-700'}`}
+                            onClick={() => {
+                              setActiveCategoryId(c.id);
+                              setCategoryMenuOpen(false);
+                            }}
+                          >
+                            {c.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <button
                       className="text-gray-600 hover:text-gray-800 p-1"
@@ -256,7 +286,7 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-                {(expandByDefault || selectedCategoryId === cat.id) && (
+                {cat.id === activeCategory?.id && (
                   <>
                     <form onSubmit={(e) => { e.preventDefault(); addProjectToCategory(cat.id, projectInputs[cat.id] || ''); setProjectInputs(prev => ({...prev, [cat.id]: ''})); }} className="flex gap-2 mb-4 ml-4">
                       <input
